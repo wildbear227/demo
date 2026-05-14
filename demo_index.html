@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demand Artifact Generator — DEMO | DoD Gov IT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060D1A;--panel:#0B1525;--panel2:#0C1A2E;--border:#1A2E4A;--border2:#1E3A5F;
+  --accent:#00C2FF;--accent2:#005C80;--gold:#FFB800;--green:#00E87A;--red:#FF3A3A;
+  --purple:#A78BFA;--orange:#F97316;--teal:#2DD4BF;--cyan:#06B6D4;
+  --muted:#3A5570;--text:#8BACC4;--bright:#D4E8F8;--white:#F0F8FF;
+}
+body{font-family:"Exo 2",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,194,255,.01) 2px,rgba(0,194,255,.01) 4px);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+button{cursor:pointer;transition:opacity .15s}button:hover:not(:disabled){opacity:.82}
+
+/* HEADER */
+#hdr{position:sticky;top:0;z-index:100;background:rgba(6,13,26,.97);border-bottom:2px solid var(--accent);padding:.7rem 1.8rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(8px)}
+.hdr-left h1{font-family:"Rajdhani",sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.2em;color:var(--white);text-transform:uppercase}
+.hdr-left p{font-family:"Share Tech Mono",monospace;font-size:.52rem;color:var(--accent);margin-top:2px;letter-spacing:.1em}
+.hdr-right{display:flex;gap:10px;align-items:center}
+.demo-badge{font-family:"Share Tech Mono",monospace;font-size:.52rem;font-weight:700;color:#000;background:var(--gold);padding:3px 10px;letter-spacing:.1em;border-radius:2px}
+.fouo-badge{font-family:"Share Tech Mono",monospace;font-size:.52rem;font-weight:700;color:var(--gold);border:1px solid var(--gold);padding:3px 8px;letter-spacing:.1em}
+#hdr-ready{font-size:.54rem;font-weight:700;color:var(--green);font-family:"Share Tech Mono",monospace;display:none}
+
+/* MAIN */
+#main{max-width:1000px;margin:0 auto;padding:1.4rem 1.3rem;position:relative;z-index:1}
+
+/* DEMO BANNER */
+.demo-banner{background:linear-gradient(135deg,rgba(255,184,0,.12),rgba(255,184,0,.06));border:1px solid rgba(255,184,0,.4);border-radius:8px;padding:.9rem 1.2rem;margin-bottom:1.2rem;display:flex;gap:12px;align-items:flex-start}
+.demo-banner .icon{font-size:1.4rem;flex-shrink:0}
+.demo-banner h3{font-family:"Rajdhani",sans-serif;font-size:.88rem;font-weight:700;color:var(--gold);letter-spacing:.08em;margin-bottom:3px}
+.demo-banner p{font-size:.63rem;color:var(--text);line-height:1.6}
+.demo-banner strong{color:var(--gold)}
+
+/* KEY BAR */
+#keybar{background:var(--panel);border:1px solid var(--gold);border-radius:6px;padding:.7rem 1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#keybar label{font-family:"Share Tech Mono",monospace;font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:.1em;white-space:nowrap}
+#key-in{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:6px 9px;color:var(--bright);font-size:.66rem;font-family:"Share Tech Mono",monospace;outline:none}
+#key-in:focus{border-color:var(--accent)}
+#key-btn{background:var(--gold);color:#000;border:none;border-radius:4px;padding:6px 14px;font-size:.58rem;font-weight:800;letter-spacing:.08em;font-family:"Share Tech Mono",monospace}
+#key-ok{font-size:.56rem;color:var(--green);font-weight:700;display:none;font-family:"Share Tech Mono",monospace}
+.key-note{font-size:.54rem;color:var(--muted);width:100%}
+
+/* STAGE DOTS */
+#stages{display:flex;align-items:center;margin-bottom:1.5rem}
+.sdot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;border:2px solid var(--border);background:var(--panel);transition:all .3s;flex-shrink:0}
+.sdot.active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 14px rgba(0,194,255,.4)}
+.sdot.done{border-color:var(--green);background:var(--green)}
+.slabel{font-size:.5rem;font-weight:700;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;text-align:center;max-width:64px;line-height:1.3;margin-top:3px}
+.slabel.active{color:var(--accent)}.slabel.done{color:var(--green)}
+.sline{flex:1;max-width:44px;height:2px;background:var(--border);margin:0 4px;margin-bottom:16px;transition:background .3s}
+.sline.done{background:var(--green)}
+.stage-wrap{display:flex;flex-direction:column;align-items:center}
+
+/* UPLOAD */
+#upload-zone{border:2px dashed var(--accent2);border-radius:10px;padding:2.5rem 2rem;text-align:center;cursor:pointer;background:var(--panel);transition:border-color .2s;margin-bottom:1rem}
+#upload-zone:hover{border-color:var(--accent)}
+#upload-zone h2{font-family:"Rajdhani",sans-serif;font-size:.92rem;font-weight:700;color:var(--white);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+#upload-zone p{font-size:.65rem;color:var(--muted);margin-bottom:10px}
+.up-chip{font-size:.54rem;color:var(--accent);border:1px solid var(--accent2);border-radius:3px;padding:2px 7px;margin:2px;display:inline-block;font-family:"Share Tech Mono",monospace}
+.up-btn-label{display:inline-block;background:var(--accent);color:#000;font-family:"Share Tech Mono",monospace;font-size:.6rem;font-weight:700;padding:7px 18px;border-radius:4px;letter-spacing:.1em;margin-top:10px}
+
+/* EXTRACT PANEL */
+#extract-panel{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:1.4rem;margin-bottom:1rem;display:none}
+#ep-name{font-size:.88rem;font-weight:700;color:var(--bright);margin-bottom:2px;font-family:"Rajdhani",sans-serif}
+#ep-chars{font-size:.6rem;color:var(--green);font-family:"Share Tech Mono",monospace;margin-bottom:.9rem}
+#ep-preview{background:var(--bg);border-radius:5px;padding:.75rem;max-height:110px;overflow-y:auto;margin-bottom:1rem}
+#ep-preview pre{font-size:.58rem;color:var(--muted);white-space:pre-wrap;font-family:"Share Tech Mono",monospace}
+.btn-extract{width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:10px;font-size:.7rem;font-weight:800;letter-spacing:.1em;font-family:"Share Tech Mono",monospace}
+.btn-extract:disabled{background:var(--accent2);color:var(--muted);cursor:wait}
+
+/* SUMMARY */
+#summary-panel{background:var(--panel);border:1px solid rgba(0,194,255,.25);border-radius:8px;padding:1rem;margin-bottom:1rem;display:none;position:relative}
+#summary-panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:8px 8px 0 0}
+.sum-label{font-family:"Share Tech Mono",monospace;font-size:.54rem;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:.7rem}
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:8px}
+.sum-item label{font-size:.5rem;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:block}
+.sum-item span{font-size:.68rem;color:var(--bright)}
+#sum-text{padding:8px 10px;background:var(--bg);border-radius:4px;font-size:.64rem;color:var(--text);line-height:1.6}
+
+/* DIVIDER */
+.sec-div{display:flex;align-items:center;gap:10px;margin:10px 0 7px}
+.sec-div::before{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border2))}
+.sec-div::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+.sec-div span{font-family:"Share Tech Mono",monospace;font-size:.54rem;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
+.sec-div .cnt{font-size:.52rem;color:var(--muted);font-family:"Share Tech Mono",monospace}
+
+/* ARTIFACT CARDS */
+.art-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .3s;margin-bottom:6px}
+.art-card.ready-card{box-shadow:0 0 12px rgba(0,0,0,.4)}
+.art-card.locked{opacity:.6}
+.card-hdr{padding:.8rem 1rem;display:flex;align-items:center;gap:.65rem}
+.card-hdr.clickable{cursor:pointer}
+.badge{font-size:.54rem;font-weight:800;letter-spacing:.1em;color:#fff;padding:2px 7px;border-radius:2px;font-family:"Share Tech Mono",monospace;white-space:nowrap}
+.card-title{font-size:.78rem;font-weight:700;color:var(--bright)}
+.card-desc{font-size:.6rem;color:var(--muted);margin-top:1px}
+.card-actions{display:flex;gap:7px;align-items:center;margin-left:auto;flex-shrink:0}
+.btn-gen{color:#fff;border:none;border-radius:4px;padding:5px 11px;font-size:.6rem;font-weight:800;letter-spacing:.06em;font-family:"Share Tech Mono",monospace}
+.btn-gen:disabled{opacity:.45;cursor:wait}
+.btn-exp{background:transparent;border-radius:4px;padding:4px 9px;font-size:.6rem;font-weight:800;letter-spacing:.06em;font-family:"Share Tech Mono",monospace}
+.ready-tag{font-size:.56rem;font-weight:800;color:var(--green)}
+.lock-tag{font-size:.56rem;font-weight:800;color:var(--gold);font-family:"Share Tech Mono",monospace}
+.toggle-arr{font-size:.66rem;color:var(--muted)}
+.card-body{padding:.9rem 1rem;max-height:380px;overflow-y:auto;border-top:1px solid var(--border)}
+.card-body.hidden{display:none}
+
+/* LOCKED OVERLAY */
+.locked-body{padding:1.2rem;text-align:center;border-top:1px solid var(--border)}
+.locked-body .lk-icon{font-size:1.5rem;margin-bottom:.5rem}
+.locked-body h4{font-family:"Rajdhani",sans-serif;font-size:.8rem;font-weight:700;color:var(--gold);letter-spacing:.08em;margin-bottom:4px}
+.locked-body p{font-size:.62rem;color:var(--muted);line-height:1.5;max-width:320px;margin:0 auto}
+.locked-body .upgrade-note{font-size:.58rem;color:var(--accent);margin-top:8px;font-family:"Share Tech Mono",monospace}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table.art{width:100%;border-collapse:collapse;min-width:360px}
+table.art th{font-weight:800;padding:6px 8px;text-align:left;font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+table.art td{padding:6px 8px;color:var(--text);border:1px solid var(--border);vertical-align:top;line-height:1.5;font-size:.64rem}
+table.art tr:nth-child(even) td{background:rgba(6,13,26,.5)}
+
+/* ZT */
+.zt-bar-wrap{position:relative;height:8px;background:var(--border);border-radius:4px;margin:5px 0 4px}
+.zt-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.zt-target{position:absolute;top:-2px;width:2px;height:12px;background:var(--gold);border-radius:1px;transform:translateX(-50%)}
+.gap-card{background:var(--bg);border-radius:4px;padding:9px 11px;margin-bottom:6px;border-left:3px solid var(--border)}
+
+/* GENERATE ALL */
+.btn-all{width:100%;background:rgba(255,184,0,.12);color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:10px;font-size:.68rem;font-weight:800;letter-spacing:.1em;font-family:"Share Tech Mono",monospace;margin-bottom:6px}
+.btn-reset{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:7px;font-size:.6rem;font-weight:700;letter-spacing:.08em;font-family:"Share Tech Mono",monospace}
+#all-ready{text-align:center;padding:.9rem;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.25);border-radius:8px;margin-bottom:6px;display:none}
+#all-ready h3{font-size:.74rem;font-weight:800;color:var(--green);letter-spacing:.1em;font-family:"Rajdhani",sans-serif}
+#all-ready p{font-size:.6rem;color:var(--muted);margin-top:3px}
+
+/* UPGRADE CTA */
+.upgrade-cta{background:linear-gradient(135deg,rgba(0,194,255,.08),rgba(167,139,250,.08));border:1px solid rgba(0,194,255,.3);border-radius:10px;padding:1.2rem;text-align:center;margin-bottom:6px}
+.upgrade-cta h3{font-family:"Rajdhani",sans-serif;font-size:1rem;font-weight:700;color:var(--white);letter-spacing:.1em;margin-bottom:6px}
+.upgrade-cta p{font-size:.64rem;color:var(--text);line-height:1.6;margin-bottom:.9rem}
+.unlock-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-bottom:.9rem}
+.unlock-chip{font-size:.54rem;color:var(--purple);border:1px solid rgba(167,139,250,.4);border-radius:3px;padding:2px 8px;font-family:"Share Tech Mono",monospace}
+.cta-note{font-size:.58rem;color:var(--accent);font-family:"Share Tech Mono",monospace}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:rgba(6,13,26,.9);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:200}
+.load-ring{width:50px;height:50px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:.8rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-family:"Share Tech Mono",monospace;font-size:.66rem;color:var(--accent);letter-spacing:.12em}
+.load-sub{font-size:.56rem;color:var(--muted);margin-top:4px;font-family:"Share Tech Mono",monospace}
+
+@media(max-width:640px){.sum-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="load-ring"></div>
+  <div class="load-txt">GENERATING ARTIFACTS</div>
+  <div class="load-sub" id="load-sub">One API call — extracting all data...</div>
+</div>
+
+<div id="hdr">
+  <div class="hdr-left">
+    <h1>Demand Engineering Artifact Generator</h1>
+    <p>DoD / Gov IT &nbsp;·&nbsp; ISSE + ZT Pipeline &nbsp;·&nbsp; Demo Edition &nbsp;·&nbsp; Google Gemini</p>
+  </div>
+  <div class="hdr-right">
+    <span id="hdr-ready"></span>
+    <span class="demo-badge">DEMO</span>
+    <span class="fouo-badge">FOUO</span>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- DEMO BANNER -->
+  <div class="demo-banner">
+    <div class="icon">🎯</div>
+    <div>
+      <h3>Demo Mode — 4 Live Artifacts + 11 Previews</h3>
+      <p>This demo uses <strong>1 API call</strong> to extract your document and generate 4 key artifacts live:
+      <strong>Risk Register, ZT Maturity Assessment, Technical Interview Questions,</strong> and <strong>Points of Contact.</strong>
+      The remaining 11 artifacts are shown as locked previews — upgrade to the full version to unlock all 15 with individual generation.</p>
+    </div>
+  </div>
+
+  <!-- API KEY -->
+  <div id="keybar">
+    <label>🔑 GEMINI API KEY</label>
+    <input id="key-in" type="password" placeholder="Free key at aistudio.google.com → Get API Key">
+    <button id="key-btn" onclick="saveKey()">SAVE KEY</button>
+    <span id="key-ok">✓ KEY SAVED</span>
+    <p class="key-note">Key stays in browser memory only. Never stored or logged.</p>
+  </div>
+
+  <!-- STAGE INDICATOR -->
+  <div id="stages">
+    <div class="stage-wrap"><div class="sdot active" id="d0">⬆</div><div class="slabel active" id="l0">Upload</div></div>
+    <div class="sline" id="ln0"></div>
+    <div class="stage-wrap"><div class="sdot" id="d1">⚙</div><div class="slabel" id="l1">AI Extract</div></div>
+    <div class="sline" id="ln1"></div>
+    <div class="stage-wrap"><div class="sdot" id="d2">📋</div><div class="slabel" id="l2">Artifacts</div></div>
+    <div class="sline" id="ln2"></div>
+    <div class="stage-wrap"><div class="sdot" id="d3">⬇</div><div class="slabel" id="l3">Export</div></div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="upload-zone" onclick="document.getElementById('file-in').click()"
+       ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+    <div style="font-size:2.2rem;margin-bottom:.6rem">📄</div>
+    <h2>Drop Demand / Effort Document Here</h2>
+    <p>Tool extracts key data and generates 4 live artifacts in one API call</p>
+    <div>
+      <span class="up-chip">Risk Register</span>
+      <span class="up-chip">ZT Maturity Assessment</span>
+      <span class="up-chip">Technical Interview Questions</span>
+      <span class="up-chip">Points of Contact</span>
+    </div>
+    <div class="up-btn-label">UPLOAD &amp; GENERATE</div>
+    <input id="file-in" type="file" accept=".txt,.pdf,.docx,.md" style="display:none" onchange="handleFile(this.files[0])">
+  </div>
+
+  <!-- EXTRACT PANEL -->
+  <div id="extract-panel">
+    <div id="ep-name"></div>
+    <div id="ep-chars"></div>
+    <div id="ep-preview"><pre id="ep-text"></pre></div>
+    <button class="btn-extract" id="ext-btn" onclick="runAll()">⚙ EXTRACT &amp; GENERATE 4 ARTIFACTS</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" style="display:none">
+
+    <!-- SUMMARY -->
+    <div id="summary-panel">
+      <div class="sum-label">Extracted Demand Summary</div>
+      <div class="sum-grid" id="sum-grid"></div>
+      <div id="sum-text"></div>
+    </div>
+
+    <!-- LIVE ARTIFACTS -->
+    <div class="sec-div"><span style="color:var(--accent)">Live Generated Artifacts</span><span class="cnt">4 / 4</span></div>
+    <div id="live-cards"></div>
+
+    <!-- LOCKED ARTIFACTS -->
+    <div class="sec-div"><span style="color:var(--gold)">🔒 Full Version Artifacts</span><span class="cnt" style="color:var(--gold)">11 locked</span></div>
+    <div id="locked-cards"></div>
+
+    <!-- UPGRADE CTA -->
+    <div class="upgrade-cta">
+      <h3>Unlock All 15 Artifacts</h3>
+      <p>The full version generates all 15 engineering artifacts with individual controls, inline previews, and text export. Each artifact uses its own targeted API call for maximum depth and accuracy.</p>
+      <div class="unlock-chips">
+        <span class="unlock-chip">Constraints &amp; Opportunities</span>
+        <span class="unlock-chip">Kickoff Agenda &amp; Minutes</span>
+        <span class="unlock-chip">Equipment &amp; Technology List</span>
+        <span class="unlock-chip">Networks Affected</span>
+        <span class="unlock-chip">Applicable STIGs</span>
+        <span class="unlock-chip">Manpower &amp; Resources</span>
+        <span class="unlock-chip">RMP Executive Overview</span>
+        <span class="unlock-chip">ZT Control Mapping</span>
+        <span class="unlock-chip">Security Control Baseline</span>
+        <span class="unlock-chip">ZT Gap &amp; Remediation Plan</span>
+        <span class="unlock-chip">Continuous Monitoring Strategy</span>
+      </div>
+      <div class="cta-note">Deploy index.html for full access — replace this file in your GitHub repo</div>
+    </div>
+
+    <button class="btn-reset" onclick="resetApp()">↩ LOAD NEW DOCUMENT</button>
+  </div>
+
+</div>
+
+<script>
+var geminiKey = "", docText = "";
+
+var LIVE = [
+  {id:"risk_register", label:"Risk Register", tag:"RR", color:"#EF4444", desc:"Risks, likelihood, impact, mitigation"},
+  {id:"zt_assessment",  label:"ZT Maturity Assessment", tag:"ZT-MA", color:"#A78BFA", desc:"DoD ZTMM v2.0 pillar scoring"},
+  {id:"interview_qs",   label:"Technical Interview Questions", tag:"TIQ", color:"#00A8E8", desc:"Pre-built stakeholder question set"},
+  {id:"poc",            label:"Points of Contact", tag:"POC", color:"#10B981", desc:"Key stakeholders and organizational contacts"},
+];
+
+var LOCKED = [
+  {id:"constraints",      label:"Constraints & Opportunities",    tag:"C&O",    color:"#F59E0B"},
+  {id:"kickoff",          label:"Kickoff Agenda & Minutes",        tag:"KO",     color:"#10B981"},
+  {id:"equipment",        label:"Equipment & Technology List",     tag:"EQ",     color:"#A78BFA"},
+  {id:"networks",         label:"Networks Affected",               tag:"NET",    color:"#2DD4BF"},
+  {id:"stigs",            label:"Applicable STIGs",                tag:"STIG",   color:"#F97316"},
+  {id:"manpower",         label:"Manpower & Resources",            tag:"MR",     color:"#F59E0B"},
+  {id:"rmp_overview",     label:"RMP Executive Overview",          tag:"RMP",    color:"#06B6D4"},
+  {id:"zt_controls",      label:"ZT Control Mapping",              tag:"ZT-CM",  color:"#06B6D4"},
+  {id:"control_baseline", label:"Security Control Baseline",       tag:"SCB",    color:"#EF4444"},
+  {id:"zt_gaps",          label:"ZT Gap & Remediation Plan",       tag:"ZT-GAP", color:"#F97316"},
+  {id:"conmon",           label:"Continuous Monitoring Strategy",  tag:"CONMON", color:"#10B981"},
+];
+
+function saveKey(){
+  geminiKey = document.getElementById("key-in").value.trim();
+  if(!geminiKey){alert("Enter your Gemini API key.");return;}
+  document.getElementById("key-ok").style.display = "inline";
+  document.getElementById("key-in").value = "●".repeat(20);
+}
+
+function handleDrop(e){e.preventDefault();var f=e.dataTransfer.files[0];if(f)handleFile(f);}
+function handleFile(file){
+  var r = new FileReader();
+  r.onload = function(e){
+    docText = e.target.result;
+    document.getElementById("ep-name").textContent = file.name;
+    document.getElementById("ep-chars").textContent = "Loaded — " + docText.length.toLocaleString() + " characters";
+    document.getElementById("ep-text").textContent = docText.slice(0, 500) + "...";
+    document.getElementById("upload-zone").style.display = "none";
+    document.getElementById("extract-panel").style.display = "block";
+    setStage(1);
+  };
+  r.readAsText(file);
+}
+
+async function callGemini(prompt){
+  if(!geminiKey){alert("Save your Gemini API key first.");throw new Error("No key");}
+  var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiKey;
+  var res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.2, maxOutputTokens:4096}})});
+  var data = await res.json();
+  if(data.error) throw new Error(data.error.message);
+  var raw = (data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text)||"{}";
+  try{return JSON.parse(raw.replace(/```json|```/g,"").trim());}
+  catch(e){return {error:"parse",raw:raw};}
+}
+
+async function runAll(){
+  if(!geminiKey){alert("Save your Gemini API key first.");return;}
+  var btn = document.getElementById("ext-btn");
+  btn.disabled = true; btn.textContent = "⚙ GENERATING...";
+  document.getElementById("loading").style.display = "flex";
+  setStage(1);
+
+  var prompt = `You are a senior DoD Government IT Systems Engineer and ISSE/Zero Trust architect.
+Analyze this demand document and generate ALL of the following in ONE JSON response.
+Use DoD/RMF/ZT terminology. Return ONLY valid JSON, no markdown, no preamble.
+
+{
+  "summary": {
+    "program_name": "...",
+    "requester": "...",
+    "effort_type": "...",
+    "technical_domain": "...",
+    "timeline": "...",
+    "network_environment": "SIPRNET|NIPRNET|Both|Unknown",
+    "classification": "FOUO or UNCLASS",
+    "description": "2-3 sentence summary"
+  },
+  "risk_register": {
+    "risks": [
+      {"id":"RSK-01","description":"...","likelihood":"High|Medium|Low","impact":"Critical|High|Medium|Low","level":"Critical|High|Medium|Low","mitigation":"..."}
+    ]
+  },
+  "zt_assessment": {
+    "overall_score": "X.X / 5.0",
+    "overall_zt_maturity": "Traditional|Initial|Advanced|Optimal",
+    "pillars": [
+      {"pillar":"Identity","score":2,"level":"Initial","current_state":"...","gaps":["gap1","gap2"],"target_score":4,"priority":"Critical|High|Medium"},
+      {"pillar":"Devices","score":2,"level":"Initial","current_state":"...","gaps":["gap1"],"target_score":3,"priority":"High"},
+      {"pillar":"Networks","score":1,"level":"Traditional","current_state":"...","gaps":["gap1","gap2"],"target_score":4,"priority":"Critical"},
+      {"pillar":"Applications & Workloads","score":2,"level":"Initial","current_state":"...","gaps":["gap1"],"target_score":3,"priority":"High"},
+      {"pillar":"Data","score":1,"level":"Traditional","current_state":"...","gaps":["gap1"],"target_score":3,"priority":"High"},
+      {"pillar":"Visibility & Analytics","score":2,"level":"Initial","current_state":"...","gaps":["gap1"],"target_score":4,"priority":"High"},
+      {"pillar":"Automation & Orchestration","score":1,"level":"Traditional","current_state":"...","gaps":["gap1"],"target_score":3,"priority":"Medium"}
+    ]
+  },
+  "interview_qs": {
+    "sections": [
+      {"title":"System Architecture","questions":["Q1","Q2","Q3"]},
+      {"title":"Security & RMF","questions":["Q1","Q2","Q3"]},
+      {"title":"Integration & Data Flow","questions":["Q1","Q2","Q3"]},
+      {"title":"Operational Requirements","questions":["Q1","Q2"]},
+      {"title":"Constraints & Risk","questions":["Q1","Q2"]}
+    ]
+  },
+  "poc": {
+    "contacts": [
+      {"name":"[Billet TBD]","organization":"...","role":"...","phone":"DSN: TBD","email":"SIPR: TBD","notes":"..."}
+    ]
+  }
+}
+
+Generate 6-8 risks, realistic ZT scores for DoD SIPRNET environment, 5 sections of interview questions, 8 POCs.
+DOCUMENT:\n` + docText.slice(0, 3500);
+
+  try{
+    var result = await callGemini(prompt);
+    if(result.error){alert("Generation failed: " + result.error + "\n\n" + (result.raw||"").slice(0,200));
+      btn.disabled=false;btn.textContent="⚙ EXTRACT & GENERATE 4 ARTIFACTS";
+      document.getElementById("loading").style.display="none";return;}
+
+    buildSummary(result.summary||{});
+    buildLiveCards(result);
+    buildLockedCards();
+    document.getElementById("extract-panel").style.display="none";
+    document.getElementById("results").style.display="block";
+    document.getElementById("summary-panel").style.display="block";
+    setStage(2);
+    document.getElementById("hdr-ready").textContent="✓ 4 READY";
+    document.getElementById("hdr-ready").style.display="inline";
+  }catch(e){
+    alert("Error: " + e.message);
+    btn.disabled=false;btn.textContent="⚙ EXTRACT & GENERATE 4 ARTIFACTS";
+  }
+  document.getElementById("loading").style.display="none";
+}
+
+function buildSummary(s){
+  var g = document.getElementById("sum-grid");
+  var fields=[["Program",s.program_name],["Requester",s.requester],["Effort Type",s.effort_type],
+    ["Domain",s.technical_domain],["Timeline",s.timeline],["Network",s.network_environment],["Classification",s.classification]];
+  g.innerHTML = fields.map(function(f){return "<div class=\"sum-item\"><label>"+f[0]+"</label><span>"+(f[1]||"—")+"</span></div>";}).join("");
+  document.getElementById("sum-text").textContent = s.description||"";
+}
+
+function buildLiveCards(result){
+  var container = document.getElementById("live-cards");
+  container.innerHTML = "";
+  LIVE.forEach(function(def){
+    var data = result[def.id];
+    var card = document.createElement("div");
+    card.className = "art-card ready-card";
+    card.id = "card-"+def.id;
+    card.style.borderColor = def.color+"55";
+    card.style.boxShadow = "0 0 12px "+def.color+"18";
+    card.innerHTML =
+      "<div class=\"card-hdr clickable\" onclick=\"toggleCard(\'"+def.id+"\')\">"+
+        "<span class=\"badge\" style=\"background:"+def.color+"\">"+def.tag+"</span>"+
+        "<div><div class=\"card-title\">"+def.label+"</div><div class=\"card-desc\">"+def.desc+"</div></div>"+
+        "<div class=\"card-actions\">"+
+          "<span class=\"ready-tag\">✓ READY</span>"+
+          "<button class=\"btn-exp\" style=\"color:"+def.color+";border:1px solid "+def.color+"\" onclick=\"event.stopPropagation();exportArt(\'"+def.id+"\',\'"+def.label+"\')\">⬇ EXPORT</button>"+
+          "<span class=\"toggle-arr\" id=\"arr-"+def.id+"\">▼</span>"+
+        "</div>"+
+      "</div>"+
+      "<div class=\"card-body hidden\" id=\"body-"+def.id+"\">"+renderBody(def.id, data, def.color)+"</div>";
+    container.appendChild(card);
+  });
+}
+
+function buildLockedCards(){
+  var container = document.getElementById("locked-cards");
+  container.innerHTML = "";
+  LOCKED.forEach(function(def){
+    var card = document.createElement("div");
+    card.className = "art-card locked";
+    card.innerHTML =
+      "<div class=\"card-hdr\">"+
+        "<span class=\"badge\" style=\"background:"+def.color+"88\">"+def.tag+"</span>"+
+        "<div><div class=\"card-title\" style=\"opacity:.6\">"+def.label+"</div></div>"+
+        "<div class=\"card-actions\"><span class=\"lock-tag\">🔒 FULL VERSION</span></div>"+
+      "</div>";
+    container.appendChild(card);
+  });
+}
+
+function toggleCard(id){
+  var body = document.getElementById("body-"+id);
+  var arr  = document.getElementById("arr-"+id);
+  var hidden = body.classList.contains("hidden");
+  body.classList.toggle("hidden", !hidden);
+  if(arr) arr.textContent = hidden ? "▲" : "▼";
+  if(hidden) setStage(3);
+}
+
+function renderBody(id, data, color){
+  if(!data) return "<div style=\"padding:1rem;font-size:.64rem;color:var(--muted)\">No data generated.</div>";
+
+  function th(h){ return "<th style=\"background:"+color+"22;color:"+color+";border:1px solid "+color+"33\">"+h+"</th>"; }
+  function td(v){ return "<td>"+(v||"")+"</td>"; }
+  function tbl(headers, rows){
+    return "<div class=\"tbl-wrap\"><table class=\"art\"><thead><tr>"+headers.map(th).join("")+"</tr></thead><tbody>"+
+      rows.map(function(r){return "<tr>"+r.map(td).join("")+"</tr>";}).join("")+"</tbody></table></div>";
+  }
+  function ctrl(c){ return "<span style=\"color:var(--accent);font-family:Share Tech Mono,monospace;font-size:.52rem;background:rgba(0,168,232,.15);border-radius:2px;padding:1px 4px;margin:1px;display:inline-block\">"+c+"</span>"; }
+
+  if(id==="risk_register" && data.risks)
+    return tbl(["ID","Risk","Likelihood","Impact","Level","Mitigation"],
+      data.risks.map(function(r){return [r.id,r.description,r.likelihood,r.impact,r.level,r.mitigation];}));
+
+  if(id==="zt_assessment" && data.pillars){
+    var scoreColor = function(s){return s>=4?"var(--green)":s>=2?"var(--gold)":"var(--red)";};
+    return "<div style=\"display:flex;gap:12px;margin-bottom:10px\">"+
+      "<div style=\"background:var(--bg);border-radius:4px;padding:8px 12px;text-align:center\">"+
+        "<div style=\"font-size:.5rem;color:var(--muted);text-transform:uppercase;font-family:Share Tech Mono,monospace\">Score</div>"+
+        "<div style=\"font-family:Rajdhani,sans-serif;font-size:1.4rem;font-weight:700;color:"+color+"\">"+data.overall_score+"</div>"+
+      "</div>"+
+      "<div style=\"background:var(--bg);border-radius:4px;padding:8px 12px;text-align:center\">"+
+        "<div style=\"font-size:.5rem;color:var(--muted);text-transform:uppercase;font-family:Share Tech Mono,monospace\">Maturity</div>"+
+        "<div style=\"font-family:Rajdhani,sans-serif;font-size:.85rem;font-weight:700;color:var(--gold);margin-top:4px\">"+data.overall_zt_maturity+"</div>"+
+      "</div>"+
+    "</div>"+
+    data.pillars.map(function(p){
+      var pct = (p.score/5)*100; var tpct = (p.target_score/5)*100;
+      return "<div style=\"background:var(--bg);border-radius:4px;padding:9px 11px;margin-bottom:6px\">"+
+        "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:4px\">"+
+          "<span style=\"font-size:.7rem;font-weight:800;color:"+color+"\">"+p.pillar+"</span>"+
+          "<div style=\"display:flex;gap:8px\">"+
+            "<span style=\"font-size:.56rem;color:"+(p.priority==="Critical"?"var(--red)":p.priority==="High"?"var(--gold)":"var(--muted)")+";font-weight:700\">"+p.priority+"</span>"+
+            "<span style=\"font-size:.56rem;color:var(--muted);font-family:Share Tech Mono,monospace\">"+p.score+"/5 → "+p.target_score+"/5</span>"+
+          "</div>"+
+        "</div>"+
+        "<div class=\"zt-bar-wrap\"><div class=\"zt-bar-fill\" style=\"width:"+pct+"%;background:"+scoreColor(p.score)+"\"></div><div class=\"zt-target\" style=\"left:"+tpct+"%\"></div></div>"+
+        "<div style=\"font-size:.62rem;color:var(--text);margin-bottom:4px\">"+p.current_state+"</div>"+
+        "<div style=\"display:flex;flex-wrap:wrap;gap:3px\">"+(p.gaps||[]).map(function(g){return "<span style=\"font-size:.54rem;color:var(--red);background:rgba(255,58,58,.12);border-radius:3px;padding:2px 5px\">⚠ "+g+"</span>";}).join("")+"</div>"+
+      "</div>";
+    }).join("")+
+    "<div style=\"font-size:.52rem;color:var(--muted);font-style:italic;margin-top:4px\">Gold marker = target. 1=Traditional · 2=Initial · 3=Advanced · 4=Optimal · 5=Full ZT</div>";
+  }
+
+  if(id==="interview_qs" && data.sections)
+    return data.sections.map(function(sec){
+      return "<div style=\"margin-bottom:12px\"><div style=\"font-size:.58rem;font-weight:800;color:"+color+";letter-spacing:.1em;margin-bottom:4px\">"+sec.title+"</div>"+
+        "<ol style=\"padding-left:16px;margin:0\">"+(sec.questions||[]).map(function(q){return "<li style=\"font-size:.67rem;color:var(--text);margin-bottom:4px;line-height:1.5\">"+q+"</li>";}).join("")+"</ol></div>";
+    }).join("");
+
+  if(id==="poc" && data.contacts)
+    return tbl(["Name / Billet","Organization","Role","Phone/DSN","Email/SIPR","Notes"],
+      data.contacts.map(function(c){return [c.name,c.organization,c.role,c.phone,c.email,c.notes];}));
+
+  return "<pre style=\"font-size:.6rem;color:var(--text);white-space:pre-wrap\">"+JSON.stringify(data,null,2)+"</pre>";
+}
+
+var storedData = {};
+function exportArt(id, label){
+  var line = "=".repeat(64);
+  var hdr = line+"\n"+label.toUpperCase()+"\nDoD / Gov IT — Demand Artifact Generator (Demo)\nGenerated: "+new Date().toLocaleDateString()+"\n"+line+"\n\n";
+  var content = hdr + "See tool for full formatted output.";
+  var blob = new Blob([content],{type:"text/plain"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a"); a.href=url; a.download=id+"_"+Date.now()+".txt"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function setStage(idx){
+  [0,1,2,3].forEach(function(i){
+    var dot=document.getElementById("d"+i); var lbl=document.getElementById("l"+i);
+    if(!dot)return;
+    dot.classList.remove("active","done"); lbl.classList.remove("active","done");
+    if(i<idx){dot.classList.add("done");dot.textContent="✓";lbl.classList.add("done");}
+    else if(i===idx){dot.classList.add("active");lbl.classList.add("active");}
+    if(i<3){var ln=document.getElementById("ln"+i);if(ln)ln.classList.toggle("done",i<idx);}
+  });
+}
+
+function resetApp(){
+  docText="";
+  document.getElementById("upload-zone").style.display="block";
+  document.getElementById("extract-panel").style.display="none";
+  document.getElementById("results").style.display="none";
+  document.getElementById("summary-panel").style.display="none";
+  document.getElementById("hdr-ready").style.display="none";
+  document.getElementById("ep-text").textContent="";
+  var btn=document.getElementById("ext-btn");btn.disabled=false;btn.textContent="⚙ EXTRACT & GENERATE 4 ARTIFACTS";
+  setStage(0);
+}
+</script>
+</body>
+</html>
